@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Room } from '@/lib/types';
-import { CheckCircle2, AlertTriangle, X, Sparkles } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, X } from 'lucide-react';
 
 interface ConfirmationModalProps {
   room: Room | null;
@@ -24,16 +24,18 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const isTransitioningToClean = room.status === 'DIRTY';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="w-full max-w-md bg-[#0c1220] border border-white/[0.1] rounded-3xl shadow-2xl p-6 sm:p-7 overflow-hidden transform transition-all animate-in zoom-in-95 duration-200 relative"
+        className="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 sm:p-7 overflow-hidden transform transition-all animate-in zoom-in-95 duration-200 relative"
         role="dialog"
         aria-modal="true"
       >
-        {/* Background ambient radial glow */}
+        {/* Subtle top color bar */}
         <div
-          className={`absolute -top-16 -right-16 w-48 h-48 rounded-full blur-3xl pointer-events-none ${
-            isTransitioningToClean ? 'bg-emerald-500/20' : 'bg-rose-500/20'
+          className={`absolute top-0 inset-x-0 h-1 rounded-t-3xl ${
+            isTransitioningToClean
+              ? 'bg-gradient-to-r from-emerald-400 to-teal-400'
+              : 'bg-gradient-to-r from-rose-400 to-red-400'
           }`}
         />
 
@@ -41,7 +43,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <button
           onClick={onClose}
           disabled={loading}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-xl hover:bg-white/[0.06] transition-colors active:scale-95"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-colors active:scale-95"
           aria-label="ปิด"
         >
           <X className="w-5 h-5" />
@@ -50,12 +52,12 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         {/* Header Icon */}
         <div className="flex flex-col items-center text-center relative z-10">
           {isTransitioningToClean ? (
-            <div className="w-18 h-18 rounded-3xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4 shadow-xl shadow-emerald-950/50 glow-emerald">
-              <CheckCircle2 className="w-10 h-10 stroke-[2.2]" />
+            <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 mb-4 shadow-sm">
+              <CheckCircle2 className="w-9 h-9 stroke-[2.2]" />
             </div>
           ) : (
-            <div className="w-18 h-18 rounded-3xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-4 shadow-xl shadow-rose-950/50 glow-rose">
-              <AlertTriangle className="w-10 h-10 stroke-[2.2]" />
+            <div className="w-16 h-16 rounded-2xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-600 mb-4 shadow-sm">
+              <AlertTriangle className="w-9 h-9 stroke-[2.2]" />
             </div>
           )}
 
@@ -64,16 +66,20 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
               อัปเดตสถานะห้องพัก
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
               ห้อง{' '}
-              <span className="font-mono text-3xl sm:text-4xl text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-300 to-yellow-400 font-black">
+              <span
+                className={`font-mono text-3xl sm:text-4xl font-black ${
+                  isTransitioningToClean ? 'text-emerald-600' : 'text-rose-600'
+                }`}
+              >
                 {room.room_number}
               </span>
             </h2>
           </div>
 
-          {/* Thai Prompt Text */}
-          <p className="text-slate-300 text-sm sm:text-base mb-6 leading-relaxed">
+          {/* Prompt Text */}
+          <p className="text-slate-500 text-sm sm:text-base mb-6 leading-relaxed">
             {isTransitioningToClean
               ? `ยืนยันว่าห้อง ${room.room_number} ทำความสะอาดและตรวจเช็คเรียบร้อยแล้ว?`
               : `ต้องการเปลี่ยนห้อง ${room.room_number} กลับเป็น "รอทำความสะอาด" หรือไม่?`}
@@ -84,7 +90,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <button
               onClick={onClose}
               disabled={loading}
-              className="w-full py-3 px-4 rounded-2xl text-sm font-semibold bg-slate-900 hover:bg-slate-800 text-slate-300 border border-white/[0.08] transition-all active:scale-95 min-h-[48px]"
+              className="w-full py-3 px-4 rounded-2xl text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition-all active:scale-95 min-h-[48px]"
             >
               ยกเลิก
             </button>
@@ -92,14 +98,14 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             <button
               onClick={() => onConfirm(room)}
               disabled={loading}
-              className={`w-full py-3 px-4 rounded-2xl text-sm font-bold text-white transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2 min-h-[48px] ${
+              className={`w-full py-3 px-4 rounded-2xl text-sm font-bold text-white transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2 min-h-[48px] ${
                 isTransitioningToClean
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 shadow-emerald-950/60'
-                  : 'bg-gradient-to-r from-rose-600 to-red-500 hover:from-rose-500 hover:to-red-400 shadow-rose-950/60'
+                  ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-emerald-200'
+                  : 'bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 shadow-rose-200'
               }`}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               ) : isTransitioningToClean ? (
                 <>
                   <CheckCircle2 className="w-4 h-4" />

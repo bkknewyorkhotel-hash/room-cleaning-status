@@ -17,28 +17,28 @@ export const ToastContainer: React.FC<ToastProps> = ({ toasts, onDismiss }) => {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className={`pointer-events-auto flex items-center justify-between p-4 rounded-xl shadow-2xl border backdrop-blur-md transition-all animate-in slide-in-from-bottom-5 duration-200 ${
+          className={`pointer-events-auto flex items-center justify-between p-4 rounded-xl shadow-lg border transition-all animate-in slide-in-from-bottom-5 duration-200 ${
             toast.type === 'error'
-              ? 'bg-rose-950/95 border-rose-500/60 text-rose-100 shadow-rose-950/50'
+              ? 'bg-white border-rose-200 text-rose-700 shadow-rose-100'
               : toast.type === 'success'
-              ? 'bg-emerald-950/95 border-emerald-500/60 text-emerald-100 shadow-emerald-950/50'
-              : 'bg-slate-900/95 border-slate-700 text-slate-100'
+              ? 'bg-white border-emerald-200 text-emerald-700 shadow-emerald-100'
+              : 'bg-white border-blue-200 text-blue-700 shadow-blue-50'
           }`}
         >
           <div className="flex items-center gap-3">
             {toast.type === 'error' && (
-              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+              <AlertCircle className="w-5 h-5 text-rose-500 shrink-0" />
             )}
             {toast.type === 'success' && (
-              <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
             )}
-            {toast.type === 'info' && <Info className="w-5 h-5 text-blue-400 shrink-0" />}
+            {toast.type === 'info' && <Info className="w-5 h-5 text-blue-500 shrink-0" />}
             <span className="text-xs sm:text-sm font-semibold">{toast.message}</span>
           </div>
 
           <button
             onClick={() => onDismiss(toast.id)}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors ml-2"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors ml-2"
             aria-label="ปิดแจ้งเตือน"
           >
             <X className="w-4 h-4" />

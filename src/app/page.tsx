@@ -173,7 +173,7 @@ export default function RoomStatusDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b12] text-slate-100 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans selection:bg-indigo-600 selection:text-white">
       {/* Header */}
       <Header
         totalCount={totalCount}
@@ -211,27 +211,27 @@ export default function RoomStatusDashboard() {
             {Array.from({ length: 18 }).map((_, i) => (
               <div
                 key={i}
-                className="h-44 bg-slate-900/50 border border-white/[0.05] rounded-3xl animate-pulse flex flex-col justify-between p-4"
+                className="h-44 bg-white border border-slate-200 rounded-2xl animate-pulse flex flex-col justify-between p-4 shadow-sm"
               >
                 <div className="flex justify-between items-center">
-                  <div className="w-16 h-5 bg-slate-800 rounded-full" />
-                  <div className="w-8 h-4 bg-slate-800 rounded-md" />
+                  <div className="w-16 h-5 bg-slate-100 rounded-full" />
+                  <div className="w-8 h-4 bg-slate-100 rounded-md" />
                 </div>
-                <div className="w-20 h-10 bg-slate-800/80 rounded-xl mx-auto" />
-                <div className="w-full h-4 bg-slate-800/50 rounded" />
+                <div className="w-20 h-10 bg-slate-100 rounded-xl mx-auto" />
+                <div className="w-full h-4 bg-slate-100 rounded" />
               </div>
             ))}
           </div>
         ) : displayedRooms.length === 0 ? (
           /* Empty State */
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
-            <div className="w-18 h-18 rounded-3xl bg-slate-900/80 border border-white/[0.08] flex items-center justify-center text-slate-500 mb-4 shadow-xl">
+            <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 mb-4 shadow-sm">
               <SearchX className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-slate-200 mb-1">
+            <h3 className="text-xl font-bold text-slate-700 mb-1">
               ไม่พบห้องพักที่ตรงกับเงื่อนไข
             </h3>
-            <p className="text-sm text-slate-400 max-w-sm mb-5">
+            <p className="text-sm text-slate-500 max-w-sm mb-5">
               ลองเปลี่ยนคำค้นหา หรือกดเพื่อรีเซ็ตตัวกรองชั้นและสถานะทั้งหมด
             </p>
             <button
@@ -240,7 +240,7 @@ export default function RoomStatusDashboard() {
                 setFilter('ALL');
                 setSelectedFloor('ALL');
               }}
-              className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-indigo-950/50 active:scale-95"
+              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95"
             >
               แสดงห้องทั้งหมด (35 ห้อง)
             </button>
@@ -256,14 +256,14 @@ export default function RoomStatusDashboard() {
               return (
                 <section key={fl} className="space-y-3.5">
                   {/* Floor Header Badge */}
-                  <div className="flex items-center justify-between pb-2 border-b border-white/[0.06]">
+                  <div className="flex items-center justify-between pb-2 border-b border-slate-200">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 font-mono font-bold text-xs">
+                      <div className="w-7 h-7 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 font-mono font-bold text-xs">
                         {fl}
                       </div>
-                      <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                      <h2 className="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
                         <span>ชั้น {fl}</span>
-                        <span className="text-xs font-normal text-slate-400 font-mono">
+                        <span className="text-xs font-normal text-slate-500 font-mono">
                           ({roomsInFloor.length} ห้อง)
                         </span>
                       </h2>
@@ -271,13 +271,13 @@ export default function RoomStatusDashboard() {
 
                     <div className="flex items-center gap-2 text-xs font-medium">
                       {dirtyInFloor > 0 ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-300">
-                          <span className="w-1.5 h-1.5 rounded-full bg-rose-400 animate-pulse" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 border border-rose-200 text-rose-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
                           <span>รอ {dirtyInFloor}</span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
                           <span>เสร็จครบ</span>
                         </span>
                       )}
@@ -312,22 +312,22 @@ export default function RoomStatusDashboard() {
         )}
       </main>
 
-      {/* Modern Footer */}
-      <footer className="w-full bg-[#080d16]/80 backdrop-blur-md border-t border-white/[0.05] py-4 text-center text-xs text-slate-500">
+      {/* Footer */}
+      <footer className="w-full bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-indigo-400" />
-            <span className="font-semibold text-slate-300">Room Cleaning Status System</span>
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-slate-400">
+            <Building2 className="w-4 h-4 text-indigo-500" />
+            <span className="font-semibold text-slate-700">Room Cleaning Status System</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
               35 ห้อง
             </span>
           </div>
 
-          <div className="flex items-center gap-2.5 text-[11px] text-slate-400">
+          <div className="flex items-center gap-2.5 text-[11px] text-slate-500">
             <span>Bangkok 24h Timezone</span>
             <span>•</span>
-            <span className="text-emerald-400 font-medium flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-emerald-600 font-medium flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               Realtime Synchronized
             </span>
           </div>

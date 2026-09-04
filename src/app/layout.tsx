@@ -20,7 +20,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#090d16',
+  themeColor: '#ffffff',
 };
 
 export const metadata: Metadata = {
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'สถานะห้องพัก',
   },
   icons: {
@@ -44,8 +44,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="th" className={`${prompt.variable} ${plusJakarta.variable} h-full antialiased dark`}>
-      <body className="min-h-full flex flex-col bg-[#070b12] text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
+    <html lang="th" className={`${prompt.variable} ${plusJakarta.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-[#f8fafc] text-slate-800 selection:bg-indigo-600 selection:text-white font-sans">
         {children}
       </body>
     </html>
