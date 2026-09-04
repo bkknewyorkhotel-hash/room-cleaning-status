@@ -5,12 +5,11 @@ import { useRooms } from '@/lib/useRooms';
 import { Room, FilterStatus, ToastMessage } from '@/lib/types';
 import { compareRoomNumbers } from '@/lib/utils';
 import { Header } from '@/components/Header';
-import { Toolbar } from '@/components/Toolbar';
 import { RoomCard } from '@/components/RoomCard';
 import { ConfirmationModal } from '@/components/ConfirmationModal';
 import { PinModal } from '@/components/PinModal';
 import { ToastContainer } from '@/components/Toast';
-import { Sparkles, Building2, SearchX, Layers, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { SearchX, Building2, CheckCircle2, AlertTriangle, Search, X, ArrowUpDown } from 'lucide-react';
 
 export default function RoomStatusDashboard() {
   const {
@@ -28,7 +27,6 @@ export default function RoomStatusDashboard() {
   const [filter, setFilter] = useState<FilterStatus>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [dirtyFirst, setDirtyFirst] = useState(false);
-  const [selectedFloor, setSelectedFloor] = useState<string>('ALL');
 
   // Modals
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -51,37 +49,15 @@ export default function RoomStatusDashboard() {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  // Filtered & Active Rooms
+  // Active Rooms
   const activeRooms = useMemo(() => {
     return rooms.filter((r) => r.active !== false);
   }, [rooms]);
 
-  // Overall Statistics
+  // Stats
   const totalCount = activeRooms.length;
   const cleanCount = activeRooms.filter((r) => r.status === 'CLEAN').length;
   const dirtyCount = activeRooms.filter((r) => r.status === 'DIRTY').length;
-
-  // Floor Stats for Floors 1, 2, 3, 4
-  const floorStats = useMemo(() => {
-    const stats: Record<string, { total: number; dirty: number; clean: number }> = {
-      ALL: { total: totalCount, dirty: dirtyCount, clean: cleanCount },
-      '1': { total: 0, dirty: 0, clean: 0 },
-      '2': { total: 0, dirty: 0, clean: 0 },
-      '3': { total: 0, dirty: 0, clean: 0 },
-      '4': { total: 0, dirty: 0, clean: 0 },
-    };
-
-    activeRooms.forEach((r) => {
-      const fl = r.room_number.charAt(0);
-      if (stats[fl]) {
-        stats[fl].total += 1;
-        if (r.status === 'DIRTY') stats[fl].dirty += 1;
-        if (r.status === 'CLEAN') stats[fl].clean += 1;
-      }
-    });
-
-    return stats;
-  }, [activeRooms, totalCount, dirtyCount, cleanCount]);
 
   const lastUpdated = useMemo(() => {
     if (activeRooms.length === 0) return null;
@@ -92,29 +68,21 @@ export default function RoomStatusDashboard() {
     return sortedDates[0] || null;
   }, [activeRooms]);
 
-  // Processed Rooms Grid
+  // Displayed Rooms - simple flat list, no floor grouping
   const displayedRooms = useMemo(() => {
     let result = activeRooms;
 
-    // Filter by floor if selected
-    if (selectedFloor !== 'ALL') {
-      result = result.filter((r) => r.room_number.startsWith(selectedFloor));
-    }
-
-    // Filter by cleaning status
     if (filter === 'DIRTY') {
       result = result.filter((r) => r.status === 'DIRTY');
     } else if (filter === 'CLEAN') {
       result = result.filter((r) => r.status === 'CLEAN');
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.trim().toLowerCase();
       result = result.filter((r) => r.room_number.toLowerCase().includes(query));
     }
 
-    // Sorting logic
     return [...result].sort((a, b) => {
       if (dirtyFirst) {
         if (a.status === 'DIRTY' && b.status !== 'DIRTY') return -1;
@@ -122,25 +90,8 @@ export default function RoomStatusDashboard() {
       }
       return compareRoomNumbers(a.room_number, b.room_number);
     });
-  }, [activeRooms, selectedFloor, filter, searchQuery, dirtyFirst]);
+  }, [activeRooms, filter, searchQuery, dirtyFirst]);
 
-  // Group rooms by Floor when viewing All floors without search
-  const floorGroups = useMemo(() => {
-    if (selectedFloor !== 'ALL' || searchQuery.trim()) {
-      return null;
-    }
-
-    const groups: Record<string, Room[]> = {};
-    displayedRooms.forEach((r) => {
-      const fl = r.room_number.charAt(0);
-      if (!groups[fl]) groups[fl] = [];
-      groups[fl].push(r);
-    });
-
-    return groups;
-  }, [displayedRooms, selectedFloor, searchQuery]);
-
-  // Card Selection Handler
   const handleRoomClick = (room: Room) => {
     if (role === 'VIEWER') {
       setIsPinModalOpen(true);
@@ -150,7 +101,6 @@ export default function RoomStatusDashboard() {
     setIsConfirmOpen(true);
   };
 
-  // Confirm Status Update
   const handleConfirmStatusChange = async (room: Room) => {
     setActionLoading(true);
     const targetStatus = room.status === 'DIRTY' ? 'CLEAN' : 'DIRTY';
@@ -187,26 +137,90 @@ export default function RoomStatusDashboard() {
         onRefresh={refetch}
       />
 
-      {/* Toolbar Filters, Floor Selector & Search */}
-      <Toolbar
-        filter={filter}
-        setFilter={setFilter}
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        dirtyFirst={dirtyFirst}
-        setDirtyFirst={setDirtyFirst}
-        dirtyCount={dirtyCount}
-        cleanCount={cleanCount}
-        totalCount={totalCount}
-        selectedFloor={selectedFloor}
-        setSelectedFloor={setSelectedFloor}
-        floorStats={floorStats}
-      />
+      {/* Toolbar */}
+      <div className="w-full bg-white border-b border-slate-200 py-3 px-4 sm:px-6 lg:px-8 shadow-sm">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          {/* Status Filter Tabs */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none">
+            {[
+              { key: 'ALL', label: 'ทั้งหมด', count: totalCount, color: 'indigo' },
+              { key: 'DIRTY', label: 'รอทำความสะอาด', count: dirtyCount, color: 'rose' },
+              { key: 'CLEAN', label: 'สะอาดแล้ว', count: cleanCount, color: 'emerald' },
+            ].map(({ key, label, count, color }) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key as FilterStatus)}
+                className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap min-h-[40px] active:scale-95 ${
+                  filter === key
+                    ? color === 'indigo'
+                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200'
+                      : color === 'rose'
+                      ? 'bg-rose-600 text-white shadow-md shadow-rose-200'
+                      : 'bg-emerald-600 text-white shadow-md shadow-emerald-200'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                }`}
+              >
+                {key === 'DIRTY' && (
+                  <span className={`w-2 h-2 rounded-full ${filter === key ? 'bg-white' : 'bg-rose-500'} animate-pulse`} />
+                )}
+                {key === 'CLEAN' && (
+                  <span className={`w-2 h-2 rounded-full ${filter === key ? 'bg-white' : 'bg-emerald-500'}`} />
+                )}
+                <span>{label}</span>
+                <span className={`px-1.5 py-0.5 rounded-lg text-[11px] font-mono font-bold ${
+                  filter === key
+                    ? 'bg-white/25 text-white'
+                    : color === 'rose'
+                    ? 'bg-rose-100 text-rose-600'
+                    : color === 'emerald'
+                    ? 'bg-emerald-100 text-emerald-600'
+                    : 'bg-slate-200 text-slate-600'
+                }`}>
+                  {count}
+                </span>
+              </button>
+            ))}
+          </div>
 
-      {/* Main Content Area */}
+          {/* Search + Sort */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1 sm:w-56">
+              <Search className="w-4 h-4 absolute inset-y-0 left-3 my-auto text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ค้นหาห้อง..."
+                className="w-full pl-9 pr-8 py-2 text-xs sm:text-sm bg-slate-50 text-slate-800 placeholder-slate-400 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition-all min-h-[40px] font-mono"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={() => setDirtyFirst(!dirtyFirst)}
+              className={`px-3.5 py-2 rounded-xl text-xs font-semibold border transition-all flex items-center gap-1.5 whitespace-nowrap min-h-[40px] active:scale-95 ${
+                dirtyFirst
+                  ? 'bg-amber-50 border-amber-300 text-amber-700 shadow-sm'
+                  : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+              }`}
+              title="สลับการเรียงลำดับ"
+            >
+              <ArrowUpDown className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">รอทำก่อน</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {loading ? (
-          /* Modern Loading Skeletons */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3.5 sm:gap-4">
             {Array.from({ length: 18 }).map((_, i) => (
               <div
@@ -223,83 +237,25 @@ export default function RoomStatusDashboard() {
             ))}
           </div>
         ) : displayedRooms.length === 0 ? (
-          /* Empty State */
           <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
             <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 flex items-center justify-center text-slate-400 mb-4 shadow-sm">
               <SearchX className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-slate-700 mb-1">
-              ไม่พบห้องพักที่ตรงกับเงื่อนไข
-            </h3>
+            <h3 className="text-xl font-bold text-slate-700 mb-1">ไม่พบห้องพักที่ตรงกับเงื่อนไข</h3>
             <p className="text-sm text-slate-500 max-w-sm mb-5">
-              ลองเปลี่ยนคำค้นหา หรือกดเพื่อรีเซ็ตตัวกรองชั้นและสถานะทั้งหมด
+              ลองเปลี่ยนคำค้นหา หรือกดเพื่อรีเซ็ตตัวกรองทั้งหมด
             </p>
             <button
               onClick={() => {
                 setSearchQuery('');
                 setFilter('ALL');
-                setSelectedFloor('ALL');
               }}
               className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md active:scale-95"
             >
-              แสดงห้องทั้งหมด (35 ห้อง)
+              แสดงห้องทั้งหมด ({totalCount} ห้อง)
             </button>
           </div>
-        ) : floorGroups && Object.keys(floorGroups).length > 1 ? (
-          /* Floor Grouped Layout */
-          <div className="space-y-8">
-            {Object.keys(floorGroups).sort().map((fl) => {
-              const roomsInFloor = floorGroups[fl];
-              const dirtyInFloor = roomsInFloor.filter((r) => r.status === 'DIRTY').length;
-              const cleanInFloor = roomsInFloor.filter((r) => r.status === 'CLEAN').length;
-
-              return (
-                <section key={fl} className="space-y-3.5">
-                  {/* Floor Header Badge */}
-                  <div className="flex items-center justify-between pb-2 border-b border-slate-200">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-7 h-7 rounded-lg bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600 font-mono font-bold text-xs">
-                        {fl}
-                      </div>
-                      <h2 className="text-base sm:text-lg font-bold text-slate-800 flex items-center gap-2">
-                        <span>ชั้น {fl}</span>
-                        <span className="text-xs font-normal text-slate-500 font-mono">
-                          ({roomsInFloor.length} ห้อง)
-                        </span>
-                      </h2>
-                    </div>
-
-                    <div className="flex items-center gap-2 text-xs font-medium">
-                      {dirtyInFloor > 0 ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-100 border border-rose-200 text-rose-700">
-                          <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse" />
-                          <span>รอ {dirtyInFloor}</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                          <span>เสร็จครบ</span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Rooms in Floor Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-                    {roomsInFloor.map((room) => (
-                      <RoomCard
-                        key={room.id}
-                        room={room}
-                        onSelect={handleRoomClick}
-                      />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
         ) : (
-          /* Single Flat Grid */
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
             {displayedRooms.map((room) => (
               <RoomCard
@@ -319,10 +275,9 @@ export default function RoomStatusDashboard() {
             <Building2 className="w-4 h-4 text-indigo-500" />
             <span className="font-semibold text-slate-700">Room Cleaning Status System</span>
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 border border-slate-200">
-              35 ห้อง
+              {totalCount} ห้อง
             </span>
           </div>
-
           <div className="flex items-center gap-2.5 text-[11px] text-slate-500">
             <span>Bangkok 24h Timezone</span>
             <span>•</span>
@@ -346,7 +301,7 @@ export default function RoomStatusDashboard() {
         loading={actionLoading}
       />
 
-      {/* Role / PIN Modal */}
+      {/* PIN Modal */}
       <PinModal
         isOpen={isPinModalOpen}
         onClose={() => setIsPinModalOpen(false)}
@@ -366,7 +321,6 @@ export default function RoomStatusDashboard() {
         }}
       />
 
-      {/* Toast Notifications */}
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
     </div>
   );
