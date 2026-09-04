@@ -41,24 +41,57 @@ FOR UPDATE
 USING (true) 
 WITH CHECK (true);
 
+-- Allow public delete access to rooms (for reset and room deletion)
+CREATE POLICY "Allow public delete access to rooms" 
+ON public.rooms 
+FOR DELETE 
+USING (true);
+
 -- Enable Realtime for the rooms table
 ALTER PUBLICATION supabase_realtime ADD TABLE public.rooms;
 
--- Seed Sample Data (Rooms 101-105, 201-205, 301-305)
+-- Seed Sample Data (Rooms 101-105, 201-210, 301-310, 401-410 - Total 35 rooms)
 INSERT INTO public.rooms (room_number, status, sort_order) VALUES
+-- ชั้น 1 (101-105)
 ('101', 'DIRTY', 1),
 ('102', 'CLEAN', 2),
 ('103', 'DIRTY', 3),
 ('104', 'CLEAN', 4),
 ('105', 'CLEAN', 5),
+
+-- ชั้น 2 (201-210)
 ('201', 'CLEAN', 6),
 ('202', 'DIRTY', 7),
 ('203', 'CLEAN', 8),
 ('204', 'DIRTY', 9),
 ('205', 'DIRTY', 10),
-('301', 'CLEAN', 11),
-('302', 'CLEAN', 12),
-('303', 'DIRTY', 13),
-('304', 'CLEAN', 14),
-('305', 'CLEAN', 15)
+('206', 'CLEAN', 11),
+('207', 'DIRTY', 12),
+('208', 'CLEAN', 13),
+('209', 'DIRTY', 14),
+('210', 'CLEAN', 15),
+
+-- ชั้น 3 (301-310)
+('301', 'CLEAN', 16),
+('302', 'CLEAN', 17),
+('303', 'DIRTY', 18),
+('304', 'CLEAN', 19),
+('305', 'CLEAN', 20),
+('306', 'DIRTY', 21),
+('307', 'CLEAN', 22),
+('308', 'DIRTY', 23),
+('309', 'CLEAN', 24),
+('310', 'CLEAN', 25),
+
+-- ชั้น 4 (401-410)
+('401', 'DIRTY', 26),
+('402', 'CLEAN', 27),
+('403', 'DIRTY', 28),
+('404', 'CLEAN', 29),
+('405', 'CLEAN', 30),
+('406', 'DIRTY', 31),
+('407', 'CLEAN', 32),
+('408', 'CLEAN', 33),
+('409', 'DIRTY', 34),
+('410', 'CLEAN', 35)
 ON CONFLICT (room_number) DO NOTHING;

@@ -92,10 +92,10 @@ export default function AdminRoomsPage() {
   };
 
   const handleResetSeed = async () => {
-    if (confirm('คุณต้องการรีเซ็ตข้อมูลห้องพักกลับเป็นค่าเริ่มต้น (15 ห้อง) ใช่หรือไม่?')) {
+    if (confirm('คุณต้องการรีเซ็ตข้อมูลห้องพักกลับเป็นค่าเริ่มต้น (35 ห้อง) ใช่หรือไม่?')) {
       const ok = await resetToSeedRooms();
       if (ok) {
-        addToast('success', 'รีเซ็ตข้อมูลห้องพักเป็นค่าเริ่มต้นเรียบร้อยแล้ว');
+        addToast('success', 'รีเซ็ตข้อมูลห้องพักเป็นค่าเริ่มต้น (35 ห้อง) เรียบร้อยแล้ว');
       }
     }
   };
@@ -133,7 +133,7 @@ export default function AdminRoomsPage() {
             <button
               onClick={handleResetSeed}
               className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 border border-slate-700 text-xs font-semibold rounded-xl transition-colors min-h-[44px]"
-              title="รีเซ็ตกลับเป็นห้องตัวอย่าง 15 ห้อง"
+              title="รีเซ็ตกลับเป็นห้องตัวอย่างเริ่มต้น 35 ห้อง"
             >
               <RotateCcw className="w-4 h-4" />
             </button>

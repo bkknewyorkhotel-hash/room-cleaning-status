@@ -17,6 +17,7 @@ export default function RoomStatusDashboard() {
     rooms,
     loading,
     connectionStatus,
+    isSupabaseConfigured,
     role,
     setRole,
     updateRoomStatus,
@@ -136,6 +137,7 @@ export default function RoomStatusDashboard() {
         dirtyCount={dirtyCount}
         lastUpdated={lastUpdated}
         connectionStatus={connectionStatus}
+        isSupabaseConfigured={isSupabaseConfigured}
         role={role}
         onOpenPinModal={() => setIsPinModalOpen(true)}
         onRefresh={refetch}

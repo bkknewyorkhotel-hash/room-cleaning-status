@@ -12,6 +12,7 @@ interface HeaderProps {
   dirtyCount: number;
   lastUpdated: string | null;
   connectionStatus: 'online' | 'connecting' | 'offline';
+  isSupabaseConfigured?: boolean;
   role: UserRole;
   onOpenPinModal: () => void;
   onRefresh?: () => void;
@@ -23,6 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   dirtyCount,
   lastUpdated,
   connectionStatus,
+  isSupabaseConfigured,
   role,
   onOpenPinModal,
   onRefresh,
@@ -42,17 +44,25 @@ export const Header: React.FC<HeaderProps> = ({
               <div
                 className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
                   connectionStatus === 'online'
-                    ? 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
+                    ? isSupabaseConfigured === false
+                      ? 'bg-amber-950/60 border-amber-500/40 text-amber-300'
+                      : 'bg-emerald-950/60 border-emerald-500/40 text-emerald-300'
                     : connectionStatus === 'connecting'
                     ? 'bg-amber-950/60 border-amber-500/40 text-amber-300'
                     : 'bg-slate-800 border-slate-700 text-slate-400'
                 }`}
-                title="สถานะการเชื่อมต่อ Realtime"
+                title={
+                  isSupabaseConfigured === false
+                    ? 'โหมดออฟไลน์/ทดสอบในเครื่อง (ยังไม่ได้เชื่อมต่อ Supabase Database)'
+                    : 'สถานะการเชื่อมต่อ Supabase Cloud Realtime'
+                }
               >
                 <span
                   className={`w-2 h-2 rounded-full ${
                     connectionStatus === 'online'
-                      ? 'bg-emerald-400 animate-pulse'
+                      ? isSupabaseConfigured === false
+                        ? 'bg-amber-400'
+                        : 'bg-emerald-400 animate-pulse'
                       : connectionStatus === 'connecting'
                       ? 'bg-amber-400 animate-ping'
                       : 'bg-slate-500'
@@ -60,7 +70,9 @@ export const Header: React.FC<HeaderProps> = ({
                 />
                 <span>
                   {connectionStatus === 'online'
-                    ? 'ออนไลน์'
+                    ? isSupabaseConfigured === false
+                      ? 'โหมดชั่วคราว (ยังไม่ต่อ Database)'
+                      : 'ออนไลน์ (Supabase)'
                     : connectionStatus === 'connecting'
                     ? 'กำลังเชื่อมต่อ'
                     : 'ออฟไลน์'}
