@@ -339,7 +339,7 @@ export function useRooms() {
             status: 'DIRTY',
             updated_at: new Date().toISOString(),
             active: true,
-            sort_order: Date.now(),
+            sort_order: Math.floor(Date.now() / 1000),
           })
           .select()
           .single();

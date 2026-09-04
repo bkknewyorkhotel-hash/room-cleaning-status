@@ -7,6 +7,7 @@ import { Room } from '@/lib/types';
 import { formatBangkokTime, compareRoomNumbers } from '@/lib/utils';
 import {
   ArrowLeft,
+  Plus,
   Edit2,
   Eye,
   EyeOff,
@@ -25,12 +26,16 @@ export default function AdminRoomsPage() {
   const {
     rooms,
     loading,
+    addRoom,
     editRoom,
     toggleRoomActive,
     resetToSeedRooms,
     refetch,
   } = useRooms();
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newRoomNumber, setNewRoomNumber] = useState('');
+  const [addLoading, setAddLoading] = useState(false);
   const [editingRoom, setEditingRoom] = useState<Room | null>(null);
   const [editRoomNumber, setEditRoomNumber] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,6 +48,24 @@ export default function AdminRoomsPage() {
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 4000);
+  };
+
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newRoomNumber.trim();
+    if (!trimmed) return;
+
+    setAddLoading(true);
+    const success = await addRoom(trimmed);
+    setAddLoading(false);
+
+    if (success) {
+      addToast('success', `เพิ่มห้อง ${trimmed} เรียบร้อยแล้ว`);
+      setNewRoomNumber('');
+      setIsAddModalOpen(false);
+    } else {
+      addToast('error', `ไม่สามารถเพิ่มห้อง ${trimmed} ได้ (อาจมีหมายเลขนี้อยู่แล้ว)`);
+    }
   };
 
   const handleEditSubmit = async (e: React.FormEvent) => {
@@ -118,7 +141,7 @@ export default function AdminRoomsPage() {
                   จัดการห้องพัก (Admin)
                 </h1>
                 <p className="text-[11px] text-slate-500 hidden sm:block">
-                  แก้ไขหมายเลขห้อง และเปิด-ปิดการใช้งาน
+                  เพิ่ม แก้ไขหมายเลขห้อง และเปิด-ปิดการใช้งาน
                 </p>
               </div>
             </div>
@@ -132,6 +155,7 @@ export default function AdminRoomsPage() {
             >
               <RefreshCw className="w-4 h-4" />
             </button>
+
             <button
               onClick={handleResetSeed}
               className="px-3.5 py-2 bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-700 border border-slate-200 hover:border-amber-300 text-xs font-semibold rounded-xl transition-all active:scale-95 flex items-center gap-1.5 min-h-[40px]"
@@ -139,6 +163,17 @@ export default function AdminRoomsPage() {
             >
               <RotateCcw className="w-4 h-4" />
               <span className="hidden sm:inline">รีเซ็ต</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setNewRoomNumber('');
+                setIsAddModalOpen(true);
+              }}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 min-h-[40px]"
+            >
+              <Plus className="w-4 h-4" />
+              <span>เพิ่มห้องพัก</span>
             </button>
           </div>
         </div>
@@ -340,6 +375,75 @@ export default function AdminRoomsPage() {
           <span className="font-semibold text-slate-600">Room Cleaning Status — Admin Panel</span>
         </div>
       </footer>
+
+      {/* Add Room Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-3xl shadow-2xl p-6 relative overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Top accent */}
+            <div className="absolute top-0 inset-x-0 h-1 rounded-t-3xl bg-gradient-to-r from-indigo-500 to-violet-500" />
+
+            <button
+              onClick={() => setIsAddModalOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-indigo-100 border border-indigo-200 flex items-center justify-center text-indigo-600">
+                <Plus className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-extrabold text-slate-900">เพิ่มห้องพักใหม่</h3>
+                <p className="text-xs text-slate-500">กำหนดหมายเลขห้องพัก เช่น 206, 401, 501</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleAddSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+                  หมายเลขห้อง
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={newRoomNumber}
+                  onChange={(e) => setNewRoomNumber(e.target.value)}
+                  placeholder="เช่น 501"
+                  className="w-full px-4 py-3 bg-slate-50 text-slate-900 rounded-2xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 font-mono text-lg tracking-wide"
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setIsAddModalOpen(false)}
+                  disabled={addLoading}
+                  className="flex-1 py-3 rounded-2xl text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 transition-all"
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  type="submit"
+                  disabled={addLoading}
+                  className="flex-1 py-3 rounded-2xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all active:scale-95 flex items-center justify-center gap-2"
+                >
+                  {addLoading ? (
+                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      <span>เพิ่มห้องพัก</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <ToastContainer toasts={toasts} onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))} />
     </div>

@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS public.rooms (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_by VARCHAR(100),
     active BOOLEAN NOT NULL DEFAULT TRUE,
-    sort_order INTEGER DEFAULT 0,
+    sort_order BIGINT DEFAULT 0,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
