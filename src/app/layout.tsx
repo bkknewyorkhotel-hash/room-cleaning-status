@@ -1,15 +1,18 @@
 import type { Metadata, Viewport } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Prompt, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
+const prompt = Prompt({
+  weight: ['300', '400', '500', '600', '700', '800'],
+  subsets: ['thai', 'latin'],
+  variable: '--font-prompt',
+  display: 'swap',
 });
 
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
+  variable: '--font-jakarta',
+  display: 'swap',
 });
 
 export const viewport: Viewport = {
@@ -17,12 +20,12 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#0f172a',
+  themeColor: '#090d16',
 };
 
 export const metadata: Metadata = {
-  title: 'สถานะทำความสะอาดห้อง - Room Cleaning Status',
-  description: 'ระบบติดตามสถานะทำความสะอาดห้องพัก Real-time สำหรับโรงแรม',
+  title: 'ระบบติดตามสถานะทำความสะอาดห้องพัก - Hotel Room Cleaning Status',
+  description: 'ระบบติดตามและจัดการสถานะการทำความสะอาดห้องพักโรงแรม Real-time 24 ชม.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
@@ -41,8 +44,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="th" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}>
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100 selection:bg-blue-600 selection:text-white">
+    <html lang="th" className={`${prompt.variable} ${plusJakarta.variable} h-full antialiased dark`}>
+      <body className="min-h-full flex flex-col bg-[#070b12] text-slate-100 selection:bg-indigo-500 selection:text-white font-sans">
         {children}
       </body>
     </html>
